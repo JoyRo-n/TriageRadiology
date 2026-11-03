@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Triage Radiology</string>
+    <string name="app_subtitle">AI-Powered Emergency Radiology Triage System</string>
+
+    <!-- Navigation & Headers -->
+    <string name="title_patient_info">Patient &amp; Study Information</string>
+    <string name="title_scan_upload">Radiology Image Input</string>
+    <string name="title_triage_result">AI Triage Analysis</string>
+    <string name="title_triage_history">Triage History Logs</string>
+
+    <!-- Input Fields -->
+    <string name="hint_patient_id">Patient ID (e.g. RAD-2026-089)</string>
+    <string name="hint_patient_name">Full Patient Name</string>
+    <string name="hint_age">Age</string>
+    <string name="label_gender">Gender</string>
+    <string name="label_modality">Study Modality</string>
+
+    <!-- Buttons & Actions -->
+    <string name="btn_take_photo">Take Photo of CT Scan</string>
+    <string name="btn_select_image">Choose Image from Gallery</string>
+    <string name="btn_preset_samples">Select Sample X-Ray</string>
+    <string name="btn_analyze">Analyze Radiology Scan with AI</string>
+    <string name="btn_analyzing">Analyzing Scan with AI&#8230;</string>
+    <string name="btn_save_history">Save to History</string>
+    <string name="btn_clear">New Scan / Reset</string>
+    <string name="btn_server_config">Backend Settings</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_reset_default">FastAPI (8000)</string>
+    <string name="btn_port_5000">Flask (5000)</string>
+
+    <!-- Triage Statuses -->
+    <string name="triage_critical">CRITICAL (STAT)</string>
+    <string name="triage_urgent">URGENT</string>
+    <string name="triage_normal">NON-URGENT (NORMAL)</string>
+
+    <!-- Server Settings -->
+    <string name="dialog_server_title">AI Backend Server Config</string>
+    <string name="dialog_server_msg">Set the REST API endpoint of your VS Code PyTorch backend (Swagger POST /analyze-scan):</string>
+    <string name="server_status_online">PyTorch Backend Online (Live API)</string>
+    <string name="server_status_offline">Backend Offline (Mock Simulator Active)</string>
+    <string name="server_url_hint">http://10.0.2.2:8000/</string>
+
+    <!-- History & Empty states -->
+    <string name="empty_history">No triage records saved yet.</string>
+    <string name="sample_chest_xray">Sample Chest Radiograph Selected</string>
+    <string name="camera_photo_captured">Camera Capture: CT Scan Photo</string>
+</resources>

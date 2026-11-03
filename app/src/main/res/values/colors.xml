@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Medical Theme Colors -->
+    <color name="medical_blue">#0F4C81</color>
+    <color name="medical_blue_dark">#0A3459</color>
+    <color name="medical_blue_light">#E3F2FD</color>
+    <color name="medical_accent">#1E88E5</color>
+
+    <!-- Triage Status Colors -->
+    <color name="triage_critical">#D32F2F</color>
+    <color name="triage_critical_bg">#FFEBEE</color>
+    <color name="triage_urgent">#E65100</color>
+    <color name="triage_urgent_bg">#FFF3E0</color>
+    <color name="triage_normal">#2E7D32</color>
+    <color name="triage_normal_bg">#E8F5E9</color>
+
+    <!-- UI Surface & Neutral -->
+    <color name="bg_main">#F4F6F9</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="text_primary">#1E293B</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="border_light">#E2E8F0</color>
+</resources>
