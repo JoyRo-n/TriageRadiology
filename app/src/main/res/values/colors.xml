@@ -3,24 +3,27 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Medical Theme Colors -->
-    <color name="medical_blue">#0F4C81</color>
-    <color name="medical_blue_dark">#0A3459</color>
-    <color name="medical_blue_light">#E3F2FD</color>
-    <color name="medical_accent">#1E88E5</color>
+    <!-- Modern Medical Reference Colors (Teal & Sky Blue Theme) -->
+    <color name="medical_teal">#0D9488</color>
+    <color name="medical_teal_dark">#0F766E</color>
+    <color name="medical_teal_light">#F0FDFA</color>
+    <color name="medical_sky">#0284C7</color>
+    <color name="medical_sky_light">#F0F9FF</color>
+    <color name="medical_accent">#0EA5E9</color>
 
-    <!-- Triage Status Colors -->
-    <color name="triage_critical">#D32F2F</color>
-    <color name="triage_critical_bg">#FFEBEE</color>
-    <color name="triage_urgent">#E65100</color>
-    <color name="triage_urgent_bg">#FFF3E0</color>
-    <color name="triage_normal">#2E7D32</color>
-    <color name="triage_normal_bg">#E8F5E9</color>
+    <!-- Triage Status Colors (Refined Soft Tints) -->
+    <color name="triage_critical">#EF4444</color>
+    <color name="triage_critical_bg">#FEF2F2</color>
+    <color name="triage_urgent">#F59E0B</color>
+    <color name="triage_urgent_bg">#FFFBEB</color>
+    <color name="triage_normal">#10B981</color>
+    <color name="triage_normal_bg">#ECFDF5</color>
 
-    <!-- UI Surface & Neutral -->
-    <color name="bg_main">#F4F6F9</color>
+    <!-- Modern UI Canvas & Card Surfaces -->
+    <color name="bg_main">#F8FAFC</color>
     <color name="card_bg">#FFFFFF</color>
-    <color name="text_primary">#1E293B</color>
+    <color name="card_stroke">#E2E8F0</color>
+    <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#64748B</color>
-    <color name="border_light">#E2E8F0</color>
+    <color name="text_muted">#94A3B8</color>
 </resources>

@@ -8,56 +8,99 @@
     android:background="@color/bg_main"
     tools:context=".MainActivity">
 
+    <!-- TOP CURVED GRADIENT HEADER BANNER -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/medical_blue">
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="@string/app_name"
-            app:titleTextColor="@color/white">
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header_gradient"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="28dp">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Welcome, Radiologist 👋"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="AI Lung Cancer Triage System"
+                        android:textColor="#E0F2FE"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/btnServerSettings"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/bg_pill_chip"
+                    android:backgroundTint="#33FFFFFF"
+                    android:contentDescription="@string/btn_server_config"
+                    android:src="@android:drawable/ic_menu_preferences"
+                    app:tint="@color/white" />
+            </RelativeLayout>
+
+            <!-- Backend Status Connection Pill -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_pill_chip"
+                android:backgroundTint="#26FFFFFF"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingEnd="12dp">
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp">
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_badge_normal" />
 
                 <TextView
                     android:id="@+id/tvConnectionStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="#33FFFFFF"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
+                    android:layout_marginStart="8dp"
                     android:text="@string/server_status_offline"
                     android:textColor="@color/white"
-                    android:textSize="11sp" />
-
-                <ImageButton
-                    android:id="@+id/btnServerSettings"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/btn_server_config"
-                    android:src="@android:drawable/ic_menu_preferences"
-                    app:tint="@color/white" />
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
-        </androidx.appcompat.widget.Toolbar>
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
         android:clipToPadding="false"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -65,37 +108,58 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:paddingBottom="48dp">
+            android:paddingBottom="100dp">
 
             <!-- PATIENT & STUDY INFORMATION CARD -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/border_light"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/title_patient_info"
-                        android:textColor="@color/medical_blue"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/title_patient_info"
+                            android:textColor="@color/text_primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:contentDescription="@string/title_patient_info"
+                            android:src="@android:drawable/ic_menu_info_details"
+                            app:tint="@color/medical_teal" />
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="@string/hint_patient_id">
+                        android:layout_marginTop="14dp"
+                        android:hint="@string/hint_patient_id"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etPatientId"
@@ -106,10 +170,15 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:hint="@string/hint_patient_name">
+                        android:layout_marginTop="10dp"
+                        android:hint="@string/hint_patient_name"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etPatientName"
@@ -122,14 +191,19 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="10dp"
                         android:orientation="horizontal">
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:hint="@string/hint_age">
+                            android:hint="@string/hint_age"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etAge"
@@ -143,9 +217,13 @@
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
                             android:layout_weight="1"
-                            android:hint="@string/label_gender">
+                            android:hint="@string/label_gender"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp">
 
                             <AutoCompleteTextView
                                 android:id="@+id/spinnerGender"
@@ -156,116 +234,115 @@
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
+                    <!-- Focused Modality: Chest CT Scan for Lung Cancer -->
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:hint="@string/label_modality">
+                        android:layout_marginTop="10dp"
+                        android:hint="Study Modality (Lung Cancer Triage)"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
 
-                        <AutoCompleteTextView
-                            android:id="@+id/spinnerModality"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etModality"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
                             android:inputType="none"
-                            android:text="Chest X-Ray (CXR)" />
+                            android:text="Chest CT Scan (Lung Cancer Detection)" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- IMAGE SELECTION & PREVIEW CARD -->
+            <!-- IMAGE SELECTION & DROPDOWN PRESET CARD -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/border_light"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/title_scan_upload"
-                        android:textColor="@color/medical_blue"
-                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Select sample Radiology presets or upload image from device:"
+                        android:text="Select a dataset sample preset from dropdown or capture CT photo:"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
-                    <!-- Preset Samples Chips -->
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroupSamples"
+                    <!-- Sleek Exposed Dropdown Menu for Sample CT Presets (Styled in Medical Teal UI Theme) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        app:singleSelection="true">
+                        android:layout_marginTop="14dp"
+                        android:hint="Select Sample CT Scan Preset"
+                        app:boxBackgroundColor="@color/medical_teal_light"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxStrokeColor="@color/medical_teal"
+                        app:endIconTint="@color/medical_teal"
+                        app:hintTextColor="@color/medical_teal">
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipSampleCritical"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerSamplePreset"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Sample 1: Adenocarcinoma CT" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipSamplePneumonia"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sample 2: Large Cell Carcinoma CT" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipSampleTB"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sample 3: Squamous Cell Carcinoma CT" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipSampleNormal"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sample 4: Normal CT Scan" />
-                    </com.google.android.material.chip.ChipGroup>
+                            android:inputType="none"
+                            android:textColor="@color/medical_teal_dark"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            tools:text="Sample 1: Adenocarcinoma CT (Outer Lungs)" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:orientation="horizontal">
 
                         <Button
                             android:id="@+id/btnTakePhoto"
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="50dp"
                             android:layout_weight="1"
                             android:text="@string/btn_take_photo"
+                            app:cornerRadius="25dp"
                             app:icon="@android:drawable/ic_menu_camera" />
 
                         <Button
                             android:id="@+id/btnPickImage"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="10dp"
                             android:layout_weight="1"
                             android:text="@string/btn_select_image"
+                            app:cornerRadius="25dp"
                             app:icon="@android:drawable/ic_menu_gallery" />
                     </LinearLayout>
 
@@ -273,11 +350,11 @@
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardPreview"
                         android:layout_width="match_parent"
-                        android:layout_height="220dp"
-                        android:layout_marginTop="12dp"
-                        app:cardBackgroundColor="#111827"
-                        app:cardCornerRadius="8dp"
-                        app:strokeColor="@color/border_light"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="14dp"
+                        app:cardBackgroundColor="#0A0F1D"
+                        app:cardCornerRadius="16dp"
+                        app:strokeColor="@color/card_stroke"
                         app:strokeWidth="1dp">
 
                         <FrameLayout
@@ -290,18 +367,19 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="@string/title_scan_upload"
                                 android:scaleType="fitCenter"
-                                android:src="@android:drawable/ic_menu_gallery" />
+                                android:src="@drawable/sample_ct_adenocarcinoma" />
 
                             <TextView
                                 android:id="@+id/tvPresetLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom|start"
-                                android:layout_margin="10dp"
-                                android:background="#CC000000"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="4dp"
-                                android:text="Preset: Pneumothorax (Critical)"
+                                android:layout_margin="12dp"
+                                android:background="@drawable/bg_pill_chip"
+                                android:backgroundTint="#DD000000"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:text="Preset: Adenocarcinoma CT"
                                 android:textColor="@color/white"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -315,13 +393,14 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAnalyze"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="16dp"
-                android:backgroundTint="@color/medical_blue"
+                android:layout_height="58dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/medical_teal"
                 android:text="@string/btn_analyze"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                app:cornerRadius="12dp"
+                app:cornerRadius="29dp"
+                app:elevation="4dp"
                 app:icon="@android:drawable/ic_menu_send" />
 
             <ProgressBar
@@ -332,23 +411,24 @@
                 android:layout_marginBottom="16dp"
                 android:visibility="gone" />
 
-            <!-- TRIAGE RESULT CARD -->
+            <!-- TRIAGE RESULT CARD (MEDICAL DIAGNOSIS REPORT SHEET) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 android:visibility="gone"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="3dp"
-                app:strokeColor="@color/border_light"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -362,7 +442,7 @@
                             android:layout_weight="1"
                             android:text="@string/title_triage_result"
                             android:textColor="@color/text_primary"
-                            android:textSize="17sp"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -370,7 +450,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_badge_critical"
-                            android:paddingHorizontal="14dp"
+                            android:paddingHorizontal="16dp"
                             android:paddingVertical="6dp"
                             android:text="CRITICAL (STAT)"
                             android:textColor="@color/white"
@@ -378,13 +458,19 @@
                             android:textStyle="bold" />
                     </LinearLayout>
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/card_stroke" />
+
                     <!-- Primary Finding & Confidence -->
                     <TextView
                         android:id="@+id/tvPrimaryFinding"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Primary Finding: Pneumothorax (Left Upper Lobe)"
+                        android:layout_marginTop="14dp"
+                        android:text="Primary Finding: Adenocarcinoma (Mucus-Producing Cell Nodule)"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -392,7 +478,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="10dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -401,46 +487,94 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="AI Model Confidence: 94.8%"
-                            android:textColor="@color/medical_blue"
-                            android:textSize="13sp"
+                            android:text="AI Model Confidence: 95.2%"
+                            android:textColor="@color/medical_teal"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvRiskScore"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Risk Score: 9.6/10"
+                            android:text="Risk Score: 9.7/10"
                             android:textColor="@color/triage_critical"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progressConfidence"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="8dp"
                         android:progress="95"
-                        app:indicatorColor="@color/medical_blue"
-                        app:trackColor="@color/medical_blue_light"
+                        app:indicatorColor="@color/medical_teal"
+                        app:trackColor="@color/medical_teal_light"
                         app:trackCornerRadius="4dp" />
 
-                    <!-- Recommendation Box -->
+                    <!-- Lung Cancer Type & Anatomical Location Card -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:background="#F8FAFC"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_pill_chip"
+                        android:backgroundTint="#F0F9FF"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="14dp">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Clinical Triage Recommendation:"
+                            android:text="Anatomical Location:"
+                            android:textColor="@color/medical_sky"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvCancerLocation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Outer Areas of the Lungs (Mucus-Producing Cells)"
                             android:textColor="@color/text_primary"
                             android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Cancer Type Description:"
+                            android:textColor="@color/medical_sky"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvCancerExplanation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="This is the most common type of lung cancer. It begins in the cells that produce mucus, usually developing in the outer areas of the lungs. While it is often caused by smoking, it is also the most common type of lung cancer found in people who have never smoked."
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Clinical Guidance Box -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_pill_chip"
+                        android:backgroundTint="@color/medical_teal_light"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Clinical Triage Guidance:"
+                            android:textColor="@color/medical_teal_dark"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -448,7 +582,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="STAT Radiologist alert! High probability of tension pneumothorax. Immediate clinical triage required."
+                            android:text="STAT Radiologist alert! Solid peripheral pulmonary nodule with spiculation detected in outer lung field. Immediate oncology referral &amp; biopsy required."
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -457,9 +591,10 @@
                         android:id="@+id/btnSaveRecord"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="16dp"
                         android:text="@string/btn_save_history"
+                        app:cornerRadius="25dp"
                         app:icon="@android:drawable/ic_menu_save" />
 
                 </LinearLayout>
@@ -478,7 +613,7 @@
                     android:layout_weight="1"
                     android:text="@string/title_triage_history"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -489,7 +624,7 @@
                     android:padding="6dp"
                     android:text="Clear History"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <TextView
@@ -498,7 +633,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:gravity="center"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:text="@string/empty_history"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
@@ -507,7 +642,7 @@
                 android:id="@+id/rvHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="10dp"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_triage_history" />
 

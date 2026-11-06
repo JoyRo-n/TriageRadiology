@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private var selectedImageUri: Uri? = null
     private var cameraImageUri: Uri? = null
-    private var selectedPresetCondition: String? = "pneumothorax"
+    private var selectedPresetCondition: String? = "adenocarcinoma"
     private var lastTriageResponse: TriageResponse? = null
     private var lastTriageRequest: TriageRequest? = null
     private val historyRecords = mutableListOf<PatientScanRecord>()
@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
             binding.ivScanPreview.setImageURI(it)
             binding.tvPresetLabel.visibility = View.VISIBLE
             binding.tvPresetLabel.text = getString(R.string.btn_select_image)
-            binding.chipGroupSamples.clearCheck()
         }
     }
 
@@ -64,7 +63,6 @@ class MainActivity : AppCompatActivity() {
             binding.ivScanPreview.setImageURI(cameraImageUri)
             binding.tvPresetLabel.visibility = View.VISIBLE
             binding.tvPresetLabel.text = getString(R.string.camera_photo_captured)
-            binding.chipGroupSamples.clearCheck()
             Toast.makeText(this, "CT Scan photo captured!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -86,46 +84,55 @@ class MainActivity : AppCompatActivity() {
 
         setupDropdowns()
         setupHistoryRecyclerView()
-        setupSampleChips()
+        setupSamplePresetDropdown()
         setupClickListeners()
         checkBackendStatus()
+        loadSavedHistory()
     }
 
     private fun setupDropdowns() {
         val genders = arrayOf("Male", "Female", "Other")
-        val genderAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, genders)
+        val genderAdapter = ArrayAdapter(this, R.layout.dropdown_item_medical, genders)
         binding.spinnerGender.setAdapter(genderAdapter)
-
-        val modalities = arrayOf("Chest X-Ray (CXR)", "CT Thorax", "Chest MRI", "Abdominal X-Ray")
-        val modalityAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, modalities)
-        binding.spinnerModality.setAdapter(modalityAdapter)
     }
 
     private fun setupHistoryRecyclerView() {
         historyAdapter = HistoryAdapter(this, historyRecords) { record ->
-            Toast.makeText(this, "Selected record: ${record.patientId} (${record.primaryFinding})", Toast.LENGTH_SHORT).show()
+            reloadPastScanRecord(record)
         }
         binding.rvHistory.layoutManager = LinearLayoutManager(this)
         binding.rvHistory.adapter = historyAdapter
         updateHistoryVisibility()
     }
 
-    private fun setupSampleChips() {
+    private fun loadSavedHistory() {
+        val saved = repository.loadHistoryRecords(this)
+        historyRecords.clear()
+        historyRecords.addAll(saved)
+        historyAdapter.updateRecords(historyRecords)
+        updateHistoryVisibility()
+    }
+
+    private fun setupSamplePresetDropdown() {
+        val sampleOptions = arrayOf(
+            "Sample 1: Adenocarcinoma CT (Outer Lungs)",
+            "Sample 2: Large Cell Carcinoma CT (Any Lung Area)",
+            "Sample 3: Squamous Cell Carcinoma CT (Central Airways)",
+            "Sample 4: Normal CT Scan (Clear Lung Fields)"
+        )
+        val adapter = ArrayAdapter(this, R.layout.dropdown_item_medical, sampleOptions)
+        binding.spinnerSamplePreset.setAdapter(adapter)
+
         // Default selection: Adenocarcinoma CT Sample
-        binding.chipSampleCritical.isChecked = true
         applyPreset("adenocarcinoma", "RAD-2026-101", "Alexander Wright", 58, "Male", "Preset: Adenocarcinoma CT")
 
-        binding.chipSampleCritical.setOnClickListener {
-            applyPreset("adenocarcinoma", "RAD-2026-101", "Alexander Wright", 58, "Male", "Preset: Adenocarcinoma CT")
-        }
-        binding.chipSamplePneumonia.setOnClickListener {
-            applyPreset("large_cell", "RAD-2026-102", "Elena Rostova", 42, "Female", "Preset: Large Cell Carcinoma CT")
-        }
-        binding.chipSampleTB.setOnClickListener {
-            applyPreset("squamous", "RAD-2026-103", "Marcus Vance", 63, "Male", "Preset: Squamous Cell Carcinoma CT")
-        }
-        binding.chipSampleNormal.setOnClickListener {
-            applyPreset("normal", "RAD-2026-104", "Sophia Lin", 29, "Female", "Preset: Normal CT Scan")
+        binding.spinnerSamplePreset.setOnItemClickListener { _, _, position, _ ->
+            when (position) {
+                0 -> applyPreset("adenocarcinoma", "RAD-2026-101", "Alexander Wright", 58, "Male", "Preset: Adenocarcinoma CT")
+                1 -> applyPreset("large_cell", "RAD-2026-102", "Elena Rostova", 42, "Female", "Preset: Large Cell Carcinoma CT")
+                2 -> applyPreset("squamous", "RAD-2026-103", "Marcus Vance", 63, "Male", "Preset: Squamous Cell Carcinoma CT")
+                3 -> applyPreset("normal", "RAD-2026-104", "Sophia Lin", 29, "Female", "Preset: Normal CT Scan")
+            }
         }
     }
 
@@ -154,6 +161,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun reloadPastScanRecord(record: PatientScanRecord) {
+        binding.etPatientId.setText(record.patientId)
+        binding.etPatientName.setText(record.patientName)
+        binding.etAge.setText(record.age.toString())
+        binding.spinnerGender.setText(record.gender, false)
+        binding.etModality.setText(record.modality)
+
+        if (!record.imageUriString.isNull_or_empty()) {
+            selectedImageUri = Uri.parse(record.imageUriString)
+            binding.ivScanPreview.setImageURI(selectedImageUri)
+            binding.tvPresetLabel.text = "History Review: ${record.patientId}"
+        } else {
+            val presetName = record.samplePresetName ?: record.primaryFinding.lowercase(Locale.getDefault())
+            when {
+                presetName.contains("adenocarcinoma") -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_adenocarcinoma)
+                presetName.contains("large") -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_large_cell)
+                presetName.contains("squamous") -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_squamous)
+                else -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_normal)
+            }
+            binding.tvPresetLabel.text = "History Review: ${record.primaryFinding}"
+        }
+
+        val restoredResponse = TriageResponse(
+            status = "success",
+            triageCategory = record.triageCategory,
+            primaryFinding = record.primaryFinding,
+            confidence = record.confidence,
+            riskScore = if (record.triageCategory.contains("CRITICAL")) 9.6 else if (record.triageCategory.contains("URGENT")) 7.8 else 1.2,
+            recommendation = record.recommendation,
+            cancerLocation = record.cancerLocation,
+            cancerExplanation = record.cancerExplanation,
+            processedAt = record.timestamp
+        )
+
+        displayTriageResult(restoredResponse, isMockFallback = false)
+        Toast.makeText(this, "Loaded scan record for ${record.patientName} (${record.primaryFinding})", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun String?.isNull_or_empty(): Boolean = this == null || this.trim().isEmpty()
+
     private fun setupClickListeners() {
         binding.btnTakePhoto.setOnClickListener {
             launchCameraCapture()
@@ -178,6 +225,7 @@ class MainActivity : AppCompatActivity() {
         binding.tvClearHistory.setOnClickListener {
             historyRecords.clear()
             historyAdapter.clearAll()
+            repository.saveHistoryRecords(this, emptyList())
             updateHistoryVisibility()
             Toast.makeText(this, "Triage history cleared", Toast.LENGTH_SHORT).show()
         }
@@ -246,7 +294,7 @@ class MainActivity : AppCompatActivity() {
         val patientName = binding.etPatientName.text.toString().trim()
         val ageStr = binding.etAge.text.toString().trim()
         val gender = binding.spinnerGender.text.toString().trim()
-        val modality = binding.spinnerModality.text.toString().trim()
+        val modality = binding.etModality.text.toString().trim()
 
         if (patientId.isEmpty() || patientName.isEmpty() || ageStr.isEmpty()) {
             Toast.makeText(this, "Please fill in all patient details", Toast.LENGTH_SHORT).show()
@@ -282,12 +330,26 @@ class MainActivity : AppCompatActivity() {
                 is TriageResult.Success -> {
                     lastTriageResponse = result.response
                     displayTriageResult(result.response, result.isMockFallback)
+                    autoSaveTriageToHistory(request, result.response)
                 }
                 is TriageResult.Error -> {
                     Toast.makeText(this@MainActivity, "Triage error: ${result.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
+    }
+
+    private fun autoSaveTriageToHistory(req: TriageRequest, resp: TriageResponse) {
+        val record = repository.createScanRecord(
+            request = req,
+            response = resp,
+            imageUriString = selectedImageUri?.toString(),
+            isSamplePreset = selectedPresetCondition != null,
+            samplePresetName = selectedPresetCondition
+        )
+        historyAdapter.addRecord(record)
+        repository.saveHistoryRecords(this, historyRecords)
+        updateHistoryVisibility()
     }
 
     private fun displayTriageResult(response: TriageResponse, isMockFallback: Boolean) {
@@ -322,6 +384,14 @@ class MainActivity : AppCompatActivity() {
         val riskFormatted = String.format(Locale.getDefault(), "%.1f/10", response.riskScore)
         binding.tvRiskScore.text = "Risk Score: $riskFormatted"
 
+        response.cancerLocation?.let {
+            binding.tvCancerLocation.text = it
+        }
+
+        response.cancerExplanation?.let {
+            binding.tvCancerExplanation.text = it
+        }
+
         binding.tvRecommendation.text = response.recommendation
 
         if (isMockFallback) {
@@ -354,6 +424,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         historyAdapter.addRecord(record)
+        repository.saveHistoryRecords(this, historyRecords)
         updateHistoryVisibility()
         Toast.makeText(this, "Saved patient scan to history", Toast.LENGTH_SHORT).show()
     }
@@ -363,7 +434,7 @@ class MainActivity : AppCompatActivity() {
             binding.tvEmptyHistory.visibility = View.GONE
             binding.rvHistory.visibility = View.VISIBLE
         } else {
-            binding.tvEmptyHistory.visibility = View.GONE
+            binding.tvEmptyHistory.visibility = View.VISIBLE
             binding.rvHistory.visibility = View.GONE
         }
     }

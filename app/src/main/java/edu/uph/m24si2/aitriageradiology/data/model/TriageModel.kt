@@ -10,7 +10,7 @@ data class TriageRequest(
     @SerializedName("patient_name") val patientName: String,
     @SerializedName("age") val age: Int,
     @SerializedName("gender") val gender: String,
-    @SerializedName("modality") val modality: String = "Chest X-Ray",
+    @SerializedName("modality") val modality: String = "Chest CT Scan (Lung Cancer Triage)",
     @SerializedName("image_base64") val imageBase64: String? = null
 )
 
@@ -33,6 +33,8 @@ data class TriageResponse(
     @SerializedName("confidence") val confidence: Double,
     @SerializedName("risk_score") val riskScore: Double,
     @SerializedName("recommendation") val recommendation: String,
+    @SerializedName("cancer_explanation") val cancerExplanation: String? = null,
+    @SerializedName("cancer_location") val cancerLocation: String? = null,
     @SerializedName("findings") val findings: List<FindingItem> = emptyList(),
     @SerializedName("processed_at") val processedAt: String? = null,
     @SerializedName("message") val message: String? = null
@@ -52,6 +54,8 @@ data class PatientScanRecord(
     val primaryFinding: String,
     val confidence: Double,
     val recommendation: String,
+    val cancerExplanation: String? = null,
+    val cancerLocation: String? = null,
     val timestamp: String,
     val imageUriString: String? = null,
     val isSamplePreset: Boolean = false,

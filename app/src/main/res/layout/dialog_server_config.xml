@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="24dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -16,16 +17,21 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:text="@string/dialog_server_msg"
         android:textColor="@color/text_secondary"
-        android:textSize="14sp" />
+        android:textSize="13sp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/dialog_server_msg">
+        android:hint="@string/dialog_server_msg"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusTopStart="14dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etServerUrl"
@@ -38,35 +44,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnQuickPort8000"
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="46dp"
             android:layout_weight="1"
             android:text="FastAPI :8000"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            app:cornerRadius="23dp" />
 
         <Button
             android:id="@+id/btnQuickPort5000"
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="46dp"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="Flask :5000"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            app:cornerRadius="23dp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvServerHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="• Use http://10.0.2.2:8000/ when running FastAPI / Uvicorn (POST /analyze-scan) in VS Code on Android Emulator.\n• Use your computer's Wi-Fi IP (e.g., http://192.168.1.50:8000/) when testing on a real physical phone."
+        android:layout_marginTop="14dp"
+        android:text="• Use http://10.0.2.2:8000/ when running PyTorch FastAPI in VS Code on Android Emulator.\n• Use your computer's Wi-Fi IP (e.g., http://192.168.1.50:8000/) when testing on a physical device."
         android:textColor="@color/text_secondary"
         android:textSize="12sp" />
 
