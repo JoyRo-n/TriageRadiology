@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Modern Medical Reference Colors (Teal & Sky Blue Theme) -->
+    <color name="medical_teal">#0D9488</color>
+    <color name="medical_teal_dark">#0F766E</color>
+    <color name="medical_teal_light">#F0FDFA</color>
+    <color name="medical_sky">#0284C7</color>
+    <color name="medical_sky_light">#F0F9FF</color>
+    <color name="medical_accent">#0EA5E9</color>
+
+    <!-- Triage Status Colors (Refined Soft Tints) -->
+    <color name="triage_critical">#EF4444</color>
+    <color name="triage_critical_bg">#FEF2F2</color>
+    <color name="triage_urgent">#F59E0B</color>
+    <color name="triage_urgent_bg">#FFFBEB</color>
+    <color name="triage_normal">#10B981</color>
+    <color name="triage_normal_bg">#ECFDF5</color>
+
+    <!-- Modern UI Canvas & Card Surfaces -->
+    <color name="bg_main">#F8FAFC</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#E2E8F0</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+</resources>
