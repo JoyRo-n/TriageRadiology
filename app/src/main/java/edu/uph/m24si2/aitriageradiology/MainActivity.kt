@@ -1,5 +1,6 @@
 package edu.uph.m24si2.aitriageradiology
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ import edu.uph.m24si2.aitriageradiology.data.api.ApiClient
 import edu.uph.m24si2.aitriageradiology.data.model.PatientScanRecord
 import edu.uph.m24si2.aitriageradiology.data.model.TriageRequest
 import edu.uph.m24si2.aitriageradiology.data.model.TriageResponse
+import edu.uph.m24si2.aitriageradiology.data.repository.AuthRepository
 import edu.uph.m24si2.aitriageradiology.data.repository.TriageRepository
 import edu.uph.m24si2.aitriageradiology.data.repository.TriageResult
 import edu.uph.m24si2.aitriageradiology.databinding.ActivityMainBinding
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var repository: TriageRepository
+    private lateinit var authRepository: AuthRepository
     private lateinit var historyAdapter: HistoryAdapter
 
     private var selectedImageUri: Uri? = null
@@ -71,6 +74,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        authRepository = AuthRepository(this)
+        val currentUser = authRepository.getCurrentUser()
+        if (currentUser == null) {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -79,6 +91,13 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        binding.tvUserGreeting.text = "Welcome, ${currentUser.fullName} 👋"
+        binding.tvUserSubtitle.text = "${currentUser.role} • AI Triage System"
+
+        binding.tvAccountDoctorName.text = currentUser.fullName
+        binding.tvAccountDoctorRole.text = currentUser.role
+        binding.tvAccountDoctorEmail.text = currentUser.email
 
         repository = TriageRepository(this)
 
@@ -214,6 +233,10 @@ class MainActivity : AppCompatActivity() {
             showServerConfigDialog()
         }
 
+        binding.btnLogout.setOnClickListener {
+            performLogout()
+        }
+
         binding.btnAnalyze.setOnClickListener {
             performTriageAnalysis()
         }
@@ -229,6 +252,14 @@ class MainActivity : AppCompatActivity() {
             updateHistoryVisibility()
             Toast.makeText(this, "Triage history cleared", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun performLogout() {
+        authRepository.logout()
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun launchCameraCapture() {
@@ -288,6 +319,8 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
+
+
 
     private fun performTriageAnalysis() {
         val patientId = binding.etPatientId.text.toString().trim()

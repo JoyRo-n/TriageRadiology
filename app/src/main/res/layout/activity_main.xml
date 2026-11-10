@@ -33,36 +33,57 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/headerActionButtons"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvUserGreeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Welcome, Radiologist 👋"
                         android:textColor="@color/white"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvUserSubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="AI Lung Cancer Triage System"
                         android:textColor="#E0F2FE"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
-                <ImageButton
-                    android:id="@+id/btnServerSettings"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                <LinearLayout
+                    android:id="@+id/headerActionButtons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:background="@drawable/bg_pill_chip"
-                    android:backgroundTint="#33FFFFFF"
-                    android:contentDescription="@string/btn_server_config"
-                    android:src="@android:drawable/ic_menu_preferences"
-                    app:tint="@color/white" />
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnServerSettings"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_pill_chip"
+                        android:backgroundTint="#33FFFFFF"
+                        android:contentDescription="@string/btn_server_config"
+                        android:src="@android:drawable/ic_menu_preferences"
+                        app:tint="@color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnLogout"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_pill_chip"
+                        android:backgroundTint="#33FFFFFF"
+                        android:contentDescription="@string/btn_logout"
+                        android:src="@android:drawable/ic_lock_power_off"
+                        app:tint="@color/white" />
+                </LinearLayout>
             </RelativeLayout>
 
             <!-- Backend Status Connection Pill -->
@@ -109,6 +130,88 @@
             android:orientation="vertical"
             android:padding="16dp"
             android:paddingBottom="100dp">
+
+            <!-- DOCTOR DASHBOARD PROFILE & ACCOUNT CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAccountSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <!-- Avatar Badge Frame -->
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_pill_chip"
+                            android:backgroundTint="@color/medical_teal_light">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@string/title_account_settings"
+                                android:src="@android:drawable/ic_menu_myplaces"
+                                app:tint="@color/medical_teal" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvAccountDoctorName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Dr. Alexander Wright"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAccountDoctorRole"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="Senior Radiologist"
+                                android:textColor="@color/medical_teal_dark"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAccountDoctorEmail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="doctor@hospital.com"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- PATIENT & STUDY INFORMATION CARD -->
             <com.google.android.material.card.MaterialCardView
