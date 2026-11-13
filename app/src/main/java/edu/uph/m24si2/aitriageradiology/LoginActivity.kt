@@ -8,8 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import edu.uph.m24si2.aitriageradiology.data.repository.AuthRepository
 import edu.uph.m24si2.aitriageradiology.databinding.ActivityLoginBinding
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
@@ -71,11 +73,15 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        val (success, message) = authRepository.loginUser(email, password)
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        binding.btnLogin.isEnabled = false
+        lifecycleScope.launch {
+            val (success, message) = authRepository.loginUserOnline(email, password)
+            binding.btnLogin.isEnabled = true
+            Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
 
-        if (success) {
-            navigateToMain()
+            if (success) {
+                navigateToMain()
+            }
         }
     }
 

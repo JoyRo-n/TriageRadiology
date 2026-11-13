@@ -1,6 +1,8 @@
 package edu.uph.m24si2.aitriageradiology.data.repository
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -93,6 +95,28 @@ class TriageRepository(private val context: Context) {
             } catch (e: Exception) {
                 // Fallback below
             }
+
+            // Local Lung CT validation if backend is offline when scanning a custom photo
+            if (!isValidLungCtBitmap(imageUri)) {
+                val wrongMsg = "Wrong image please try again"
+                val now = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                return@withContext TriageResult.Success(
+                    TriageResponse(
+                        status = "error",
+                        triageCategory = wrongMsg,
+                        primaryFinding = wrongMsg,
+                        confidence = 0.0,
+                        riskScore = 0.0,
+                        recommendation = wrongMsg,
+                        cancerLocation = wrongMsg,
+                        cancerExplanation = wrongMsg,
+                        findings = emptyList(),
+                        processedAt = now,
+                        message = wrongMsg
+                    ),
+                    isMockFallback = false
+                )
+            }
         }
 
         // 2. Try POST /api/triage JSON endpoint
@@ -123,6 +147,61 @@ class TriageRepository(private val context: Context) {
             MultipartBody.Part.createFormData(paramName, filename, requestBody)
         } catch (e: Exception) {
             null
+        }
+    }
+
+    private fun isValidLungCtBitmap(uri: Uri): Boolean {
+        return try {
+            val stream = context.contentResolver.openInputStream(uri) ?: return false
+            val bmp = BitmapFactory.decodeStream(stream)
+            stream.close()
+            if (bmp == null || bmp.width < 64 || bmp.height < 64) return false
+
+            val w = bmp.width
+            val h = bmp.height
+            var totalSpread = 0.0
+            var colorfulCount = 0
+            var totalGray = 0.0
+            var darkCount = 0
+            var brightCount = 0
+            var sampleCount = 0
+
+            val stepX = (w / 64).coerceAtLeast(1)
+            val stepY = (h / 64).coerceAtLeast(1)
+
+            for (y in 0 until h step stepY) {
+                for (x in 0 until w step stepX) {
+                    val px = bmp.getPixel(x, y)
+                    val r = Color.red(px) / 255.0
+                    val g = Color.green(px) / 255.0
+                    val b = Color.blue(px) / 255.0
+                    val maxC = maxOf(r, g, b)
+                    val minC = minOf(r, g, b)
+                    val spread = maxC - minC
+                    totalSpread += spread
+                    if (spread > 0.16) colorfulCount++
+
+                    val gray = (r + g + b) / 3.0
+                    totalGray += gray
+                    if (gray < 0.28) darkCount++
+                    if (gray > 0.85) brightCount++
+                    sampleCount++
+                }
+            }
+            if (sampleCount == 0) return false
+            val meanSpread = totalSpread / sampleCount
+            val colorfulRatio = colorfulCount.toDouble() / sampleCount
+            val meanGray = totalGray / sampleCount
+            val darkRatio = darkCount.toDouble() / sampleCount
+            val brightRatio = brightCount.toDouble() / sampleCount
+
+            if (meanSpread > 0.085 || colorfulRatio > 0.075) return false
+            if (meanGray < 0.07 || meanGray > 0.52) return false
+            if (darkRatio < 0.25 || darkRatio > 0.88) return false
+            if (brightRatio > 0.22) return false
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 

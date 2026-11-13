@@ -3,7 +3,13 @@ package edu.uph.m24si2.aitriageradiology.data.repository
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import edu.uph.m24si2.aitriageradiology.data.api.ApiClient
+import edu.uph.m24si2.aitriageradiology.data.model.AuthResponse
+import edu.uph.m24si2.aitriageradiology.data.model.LoginRequest
+import edu.uph.m24si2.aitriageradiology.data.model.RegisterRequest
 import edu.uph.m24si2.aitriageradiology.data.model.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -14,6 +20,7 @@ class AuthRepository(private val context: Context) {
         private const val PREFS_AUTH = "ai_triage_auth_prefs"
         private const val KEY_USERS_JSON = "registered_users_list"
         private const val KEY_ACTIVE_USER_EMAIL = "active_logged_in_email"
+        private const val KEY_AUTH_TOKEN = "active_session_token"
 
         const val DEFAULT_DEMO_EMAIL = "doctor@hospital.com"
         const val DEFAULT_DEMO_PASS = "password123"
@@ -63,6 +70,115 @@ class AuthRepository(private val context: Context) {
         }
     }
 
+    private fun upsertLocalUser(user: User, plainPassword: String) {
+        val users = loadAllUsers().toMutableList()
+        val emailClean = user.email.trim().lowercase(Locale.getDefault())
+        users.removeAll { it.email.equals(emailClean, ignoreCase = true) }
+        users.add(
+            user.copy(
+                email = emailClean,
+                password = plainPassword,
+                createdAt = user.createdAt ?: getCurrentTimestamp()
+            )
+        )
+        saveAllUsers(users)
+    }
+
+    /**
+     * Registers a new doctor account on the FastAPI backend (POST /register),
+     * with local fallback only if the backend server is unreachable.
+     */
+    suspend fun registerUserOnline(user: User, confirmPassword: String): Pair<Boolean, String> =
+        withContext(Dispatchers.IO) {
+            val emailClean = user.email.trim().lowercase(Locale.getDefault())
+            try {
+                val service = ApiClient.getService(context)
+                val req = RegisterRequest(
+                    doctorEmail = emailClean,
+                    email = emailClean,
+                    newPassword = user.password,
+                    password = user.password,
+                    passwordConfirmation = confirmPassword,
+                    confirmPassword = confirmPassword,
+                    fullName = user.fullName,
+                    role = user.role
+                )
+                val response = service.registerDoctor(req)
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    val syncedUser = body.user ?: user.copy(
+                        email = emailClean,
+                        createdAt = getCurrentTimestamp()
+                    )
+                    upsertLocalUser(syncedUser, user.password)
+                    saveActiveSession(syncedUser.email, body.token)
+                    return@withContext Pair(true, body.message ?: "Account created successfully!")
+                } else {
+                    val errJson = response.errorBody()?.string()
+                    val parsedErr = try {
+                        Gson().fromJson(errJson, AuthResponse::class.java)
+                    } catch (e: Exception) {
+                        null
+                    }
+                    val errMsg = parsedErr?.message ?: parsedErr?.detail ?: "Registration failed (${response.code()})"
+                    return@withContext Pair(false, errMsg)
+                }
+            } catch (e: Exception) {
+                // Offline fallback if server is not reachable
+                return@withContext registerUser(user)
+            }
+        }
+
+    /**
+     * Authenticates a doctor account against the FastAPI backend (POST /login),
+     * verifying email and password.
+     */
+    suspend fun loginUserOnline(emailInput: String, passwordInput: String): Pair<Boolean, String> =
+        withContext(Dispatchers.IO) {
+            val emailClean = emailInput.trim().lowercase(Locale.getDefault())
+            if (emailClean.isEmpty()) {
+                return@withContext Pair(false, "Please enter your email address.")
+            }
+            if (passwordInput.isEmpty()) {
+                return@withContext Pair(false, "Please enter your password.")
+            }
+
+            try {
+                val service = ApiClient.getService(context)
+                val req = LoginRequest(
+                    doctorEmail = emailClean,
+                    email = emailClean,
+                    password = passwordInput
+                )
+                val response = service.loginDoctor(req)
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    val syncedUser = body.user ?: User(
+                        email = emailClean,
+                        password = passwordInput,
+                        fullName = DEFAULT_DEMO_NAME,
+                        role = DEFAULT_DEMO_ROLE,
+                        createdAt = getCurrentTimestamp()
+                    )
+                    upsertLocalUser(syncedUser, passwordInput)
+                    saveActiveSession(syncedUser.email, body.token)
+                    return@withContext Pair(true, body.message ?: "Welcome back, ${syncedUser.fullName}!")
+                } else {
+                    val errJson = response.errorBody()?.string()
+                    val parsedErr = try {
+                        Gson().fromJson(errJson, AuthResponse::class.java)
+                    } catch (e: Exception) {
+                        null
+                    }
+                    val errMsg = parsedErr?.message ?: parsedErr?.detail ?: "Invalid doctor email or password."
+                    return@withContext Pair(false, errMsg)
+                }
+            } catch (e: Exception) {
+                // Offline fallback if server is unreachable
+                return@withContext loginUser(emailClean, passwordInput)
+            }
+        }
+
     fun registerUser(user: User): Pair<Boolean, String> {
         val users = loadAllUsers().toMutableList()
         val existing = users.find { it.email.equals(user.email.trim(), ignoreCase = true) }
@@ -90,38 +206,23 @@ class AuthRepository(private val context: Context) {
         val foundUser = users.find { it.email.equals(emailClean, ignoreCase = true) }
 
         if (foundUser != null) {
+            if (foundUser.password.isNotEmpty() && foundUser.password != passwordInput) {
+                return Pair(false, "Invalid doctor email or password.")
+            }
             saveActiveSession(foundUser.email)
             return Pair(true, "Welcome back, ${foundUser.fullName}!")
         }
 
-        // Automatically register and sign in any user if not already in system
-        val usernamePart = emailClean.substringBefore("@").replaceFirstChar { it.uppercase() }
-        val autoName = if (usernamePart.lowercase() == "admin" || usernamePart.lowercase() == "doctor") {
-            "Dr. Alexander Wright"
-        } else {
-            "Dr. $usernamePart"
-        }
-
-        val newUser = User(
-            email = emailClean,
-            password = passwordInput,
-            fullName = autoName,
-            role = "Senior Radiologist",
-            createdAt = getCurrentTimestamp()
-        )
-
-        users.add(newUser)
-        saveAllUsers(users)
-        saveActiveSession(newUser.email)
-
-        return Pair(true, "Welcome, ${newUser.fullName}!")
+        return Pair(false, "Invalid doctor email or password. Please Sign Up first.")
     }
 
-    fun saveActiveSession(email: String) {
-        context.getSharedPreferences(PREFS_AUTH, Context.MODE_PRIVATE)
-            .edit()
+    fun saveActiveSession(email: String, token: String? = null) {
+        val editor = context.getSharedPreferences(PREFS_AUTH, Context.MODE_PRIVATE).edit()
             .putString(KEY_ACTIVE_USER_EMAIL, email.trim().lowercase(Locale.getDefault()))
-            .apply()
+        if (token != null) {
+            editor.putString(KEY_AUTH_TOKEN, token)
+        }
+        editor.apply()
     }
 
     fun getCurrentUser(): User? {
@@ -134,10 +235,25 @@ class AuthRepository(private val context: Context) {
         return getCurrentUser() != null
     }
 
+    suspend fun logoutOnline() = withContext(Dispatchers.IO) {
+        val token = context.getSharedPreferences(PREFS_AUTH, Context.MODE_PRIVATE)
+            .getString(KEY_AUTH_TOKEN, null)
+        try {
+            if (!token.isNullOrEmpty()) {
+                ApiClient.getService(context).logoutDoctor("Bearer $token")
+            }
+        } catch (e: Exception) {
+            // Ignore network error on logout
+        } finally {
+            logout()
+        }
+    }
+
     fun logout() {
         context.getSharedPreferences(PREFS_AUTH, Context.MODE_PRIVATE)
             .edit()
             .remove(KEY_ACTIVE_USER_EMAIL)
+            .remove(KEY_AUTH_TOKEN)
             .apply()
     }
 

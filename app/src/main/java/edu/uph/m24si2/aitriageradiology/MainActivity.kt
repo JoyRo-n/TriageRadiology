@@ -237,6 +237,10 @@ class MainActivity : AppCompatActivity() {
             performLogout()
         }
 
+        binding.btnAccountLogout.setOnClickListener {
+            performLogout()
+        }
+
         binding.btnAnalyze.setOnClickListener {
             performTriageAnalysis()
         }
@@ -255,11 +259,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun performLogout() {
-        authRepository.logout()
-        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-        finish()
+        lifecycleScope.launch {
+            authRepository.logoutOnline()
+            Toast.makeText(this@MainActivity, "Logged out successfully", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun launchCameraCapture() {
@@ -361,12 +368,18 @@ class MainActivity : AppCompatActivity() {
 
             when (result) {
                 is TriageResult.Success -> {
-                    lastTriageResponse = result.response
+                    val isWrongImage = result.response.status.equals("error", ignoreCase = true) ||
+                        result.response.triageCategory.contains("Wrong image", ignoreCase = true) ||
+                        result.response.primaryFinding.contains("Wrong image", ignoreCase = true)
+
+                    lastTriageResponse = if (isWrongImage) null else result.response
                     displayTriageResult(result.response, result.isMockFallback)
-                    autoSaveTriageToHistory(request, result.response)
+                    if (!isWrongImage) {
+                        autoSaveTriageToHistory(request, result.response)
+                    }
                 }
                 is TriageResult.Error -> {
-                    Toast.makeText(this@MainActivity, "Triage error: ${result.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -387,6 +400,34 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayTriageResult(response: TriageResponse, isMockFallback: Boolean) {
         binding.cardResult.visibility = View.VISIBLE
+
+        val isWrongImage = response.status.equals("error", ignoreCase = true) ||
+            response.triageCategory.contains("Wrong image", ignoreCase = true) ||
+            response.primaryFinding.contains("Wrong image", ignoreCase = true)
+
+        if (isWrongImage) {
+            val wrongMsg = "Wrong image please try again"
+            binding.tvTriageBadge.text = wrongMsg
+            binding.tvTriageBadge.setBackgroundResource(R.drawable.bg_badge_critical)
+            binding.tvRiskScore.setTextColor(getColor(R.color.triage_critical))
+            binding.tvPrimaryFinding.text = wrongMsg
+            binding.tvConfidenceText.text = wrongMsg
+            binding.progressConfidence.progress = 0
+            binding.tvRiskScore.text = wrongMsg
+            binding.tvCancerLocation.text = wrongMsg
+            binding.tvCancerExplanation.text = wrongMsg
+            binding.tvRecommendation.text = wrongMsg
+            Toast.makeText(this, wrongMsg, Toast.LENGTH_LONG).show()
+            binding.main.post {
+                binding.cardResult.getParent()?.let {
+                    binding.cardResult.requestRectangleOnScreen(
+                        android.graphics.Rect(0, 0, binding.cardResult.width, binding.cardResult.height),
+                        true
+                    )
+                }
+            }
+            return
+        }
 
         val categoryUpper = response.triageCategory.uppercase(Locale.getDefault())
         when {

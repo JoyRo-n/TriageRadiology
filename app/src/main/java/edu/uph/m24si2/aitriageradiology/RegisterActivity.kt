@@ -9,9 +9,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import edu.uph.m24si2.aitriageradiology.data.model.User
 import edu.uph.m24si2.aitriageradiology.data.repository.AuthRepository
 import edu.uph.m24si2.aitriageradiology.databinding.ActivityRegisterBinding
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -113,17 +115,21 @@ class RegisterActivity : AppCompatActivity() {
             email = email,
             password = password,
             fullName = fullName,
-            role = if (role.isNotEmpty()) role else "Radiologist"
+            role = if (role.isNotEmpty()) role else "Senior Radiologist"
         )
 
-        val (success, message) = authRepository.registerUser(newUser)
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        binding.btnRegister.isEnabled = false
+        lifecycleScope.launch {
+            val (success, message) = authRepository.registerUserOnline(newUser, confirmPassword)
+            binding.btnRegister.isEnabled = true
+            Toast.makeText(this@RegisterActivity, message, Toast.LENGTH_SHORT).show()
 
-        if (success) {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            if (success) {
+                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
         }
     }
 }

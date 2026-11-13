@@ -206,9 +206,29 @@
                                 android:textColor="@color/text_secondary"
                                 android:textSize="12sp" />
                         </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAccountLogout"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="8dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="@string/btn_logout"
+                            android:textAllCaps="false"
+                            android:textColor="@color/triage_critical"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="20dp"
+                            app:icon="@android:drawable/ic_lock_power_off"
+                            app:iconPadding="6dp"
+                            app:iconSize="16dp"
+                            app:iconTint="@color/triage_critical"
+                            app:strokeColor="@color/triage_critical"
+                            app:strokeWidth="1dp" />
                     </LinearLayout>
-
-
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
