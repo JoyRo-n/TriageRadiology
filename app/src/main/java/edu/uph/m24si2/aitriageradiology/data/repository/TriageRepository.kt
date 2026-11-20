@@ -1,8 +1,6 @@
 package edu.uph.m24si2.aitriageradiology.data.repository
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -49,12 +47,100 @@ class TriageRepository(private val context: Context) {
     fun loadHistoryRecords(context: Context): List<PatientScanRecord> {
         return try {
             val json = context.getSharedPreferences(PREFS_HISTORY, Context.MODE_PRIVATE)
-                .getString(KEY_HISTORY_DATA, null) ?: return emptyList()
+                .getString(KEY_HISTORY_DATA, null)
+            if (json == null || json.trim().isEmpty()) {
+                val preloaded = generateDefaultPreloadedRecords()
+                saveHistoryRecords(context, preloaded)
+                return preloaded
+            }
             val type = object : TypeToken<List<PatientScanRecord>>() {}.type
-            Gson().fromJson(json, type) ?: emptyList()
+            val result: List<PatientScanRecord>? = Gson().fromJson(json, type)
+            if (result.isNullOrEmpty()) {
+                val preloaded = generateDefaultPreloadedRecords()
+                saveHistoryRecords(context, preloaded)
+                preloaded
+            } else {
+                result
+            }
         } catch (e: Exception) {
-            emptyList()
+            val preloaded = generateDefaultPreloadedRecords()
+            saveHistoryRecords(context, preloaded)
+            preloaded
         }
+    }
+
+    private fun generateDefaultPreloadedRecords(): List<PatientScanRecord> {
+        val now = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        return listOf(
+            PatientScanRecord(
+                id = UUID.randomUUID().toString(),
+                patientId = "RAD-2026-101",
+                patientName = "Alexander Wright",
+                age = 58,
+                gender = "Male",
+                modality = "Chest CT Scan (Lung Cancer Detection)",
+                triageCategory = "CRITICAL",
+                primaryFinding = "Adenocarcinoma (Mucus-Producing Cell Nodule)",
+                confidence = 0.952,
+                recommendation = "STAT Radiologist alert! Solid peripheral pulmonary nodule with spiculation detected in outer lung field. Immediate oncology referral & biopsy required.",
+                cancerLocation = "Outer Areas of the Lungs (Mucus-Producing Cells)",
+                cancerExplanation = "This is the most common type of lung cancer. It begins in the cells that produce mucus, usually developing in the outer areas of the lungs. While it is often caused by smoking, it is also the most common type of lung cancer found in people who have never smoked.",
+                timestamp = now,
+                isSamplePreset = true,
+                samplePresetName = "adenocarcinoma"
+            ),
+            PatientScanRecord(
+                id = UUID.randomUUID().toString(),
+                patientId = "RAD-2026-102",
+                patientName = "Elena Rostova",
+                age = 42,
+                gender = "Female",
+                modality = "Chest CT Scan (Lung Cancer Detection)",
+                triageCategory = "CRITICAL",
+                primaryFinding = "Large Cell Carcinoma (Rapid Growth Mass)",
+                confidence = 0.938,
+                recommendation = "STAT Radiologist alert! Large unusually shaped pulmonary lesion detected. Rapid growth risk; immediate thoracic surgery and oncology review.",
+                cancerLocation = "Can Start Anywhere in the Lungs",
+                cancerExplanation = "This type is named for how the cancer cells look under a microscope—large and unusually shaped. It can start anywhere in the lungs and is known to grow and spread very quickly, which can make it more challenging to treat.",
+                timestamp = now,
+                isSamplePreset = true,
+                samplePresetName = "large_cell"
+            ),
+            PatientScanRecord(
+                id = UUID.randomUUID().toString(),
+                patientId = "RAD-2026-103",
+                patientName = "Marcus Vance",
+                age = 63,
+                gender = "Male",
+                modality = "Chest CT Scan (Lung Cancer Detection)",
+                triageCategory = "URGENT",
+                primaryFinding = "Squamous Cell Carcinoma (Central Airways Lesion)",
+                confidence = 0.912,
+                recommendation = "Urgent Radiologist consultation within 2 hours. Thick-walled cavitary lesion in central bronchial airways. Strong association with smoking history.",
+                cancerLocation = "Central Part of the Lungs / Main Airways (Bronchi)",
+                cancerExplanation = "This cancer starts in the thin, flat cells (squamous cells) that line the inside of the main airways (bronchi). It is typically found in the central part of the lungs and is very strongly linked to a history of smoking.",
+                timestamp = now,
+                isSamplePreset = true,
+                samplePresetName = "squamous"
+            ),
+            PatientScanRecord(
+                id = UUID.randomUUID().toString(),
+                patientId = "RAD-2026-104",
+                patientName = "Sophia Lin",
+                age = 29,
+                gender = "Female",
+                modality = "Chest CT Scan (Lung Cancer Detection)",
+                triageCategory = "NORMAL",
+                primaryFinding = "Normal Thoracic CT Scan (No Lung Cancer Detected)",
+                confidence = 0.968,
+                recommendation = "Standard routine review queue. Lung parenchymal attenuation is normal with clear bilateral lung fields and no pulmonary nodules.",
+                cancerLocation = "Clear Bilateral Lung Fields",
+                cancerExplanation = "Normal Thoracic CT Scan. Lung parenchymal attenuation is normal, with clear bilateral lung fields and no suspicious pulmonary nodules, masses, or mediastinal lymphadenopathy.",
+                timestamp = now,
+                isSamplePreset = true,
+                samplePresetName = "normal"
+            )
+        )
     }
 
     suspend fun checkBackendConnection(): Boolean = withContext(Dispatchers.IO) {
@@ -95,28 +181,6 @@ class TriageRepository(private val context: Context) {
             } catch (e: Exception) {
                 // Fallback below
             }
-
-            // Local Lung CT validation if backend is offline when scanning a custom photo
-            if (!isValidLungCtBitmap(imageUri)) {
-                val wrongMsg = "Wrong image please try again"
-                val now = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                return@withContext TriageResult.Success(
-                    TriageResponse(
-                        status = "error",
-                        triageCategory = wrongMsg,
-                        primaryFinding = wrongMsg,
-                        confidence = 0.0,
-                        riskScore = 0.0,
-                        recommendation = wrongMsg,
-                        cancerLocation = wrongMsg,
-                        cancerExplanation = wrongMsg,
-                        findings = emptyList(),
-                        processedAt = now,
-                        message = wrongMsg
-                    ),
-                    isMockFallback = false
-                )
-            }
         }
 
         // 2. Try POST /api/triage JSON endpoint
@@ -147,61 +211,6 @@ class TriageRepository(private val context: Context) {
             MultipartBody.Part.createFormData(paramName, filename, requestBody)
         } catch (e: Exception) {
             null
-        }
-    }
-
-    private fun isValidLungCtBitmap(uri: Uri): Boolean {
-        return try {
-            val stream = context.contentResolver.openInputStream(uri) ?: return false
-            val bmp = BitmapFactory.decodeStream(stream)
-            stream.close()
-            if (bmp == null || bmp.width < 64 || bmp.height < 64) return false
-
-            val w = bmp.width
-            val h = bmp.height
-            var totalSpread = 0.0
-            var colorfulCount = 0
-            var totalGray = 0.0
-            var darkCount = 0
-            var brightCount = 0
-            var sampleCount = 0
-
-            val stepX = (w / 64).coerceAtLeast(1)
-            val stepY = (h / 64).coerceAtLeast(1)
-
-            for (y in 0 until h step stepY) {
-                for (x in 0 until w step stepX) {
-                    val px = bmp.getPixel(x, y)
-                    val r = Color.red(px) / 255.0
-                    val g = Color.green(px) / 255.0
-                    val b = Color.blue(px) / 255.0
-                    val maxC = maxOf(r, g, b)
-                    val minC = minOf(r, g, b)
-                    val spread = maxC - minC
-                    totalSpread += spread
-                    if (spread > 0.16) colorfulCount++
-
-                    val gray = (r + g + b) / 3.0
-                    totalGray += gray
-                    if (gray < 0.28) darkCount++
-                    if (gray > 0.85) brightCount++
-                    sampleCount++
-                }
-            }
-            if (sampleCount == 0) return false
-            val meanSpread = totalSpread / sampleCount
-            val colorfulRatio = colorfulCount.toDouble() / sampleCount
-            val meanGray = totalGray / sampleCount
-            val darkRatio = darkCount.toDouble() / sampleCount
-            val brightRatio = brightCount.toDouble() / sampleCount
-
-            if (meanSpread > 0.085 || colorfulRatio > 0.075) return false
-            if (meanGray < 0.07 || meanGray > 0.52) return false
-            if (darkRatio < 0.25 || darkRatio > 0.88) return false
-            if (brightRatio > 0.22) return false
-            true
-        } catch (e: Exception) {
-            false
         }
     }
 
