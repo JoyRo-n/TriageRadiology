@@ -137,7 +137,8 @@ class MainActivity : AppCompatActivity() {
             "Sample 1: Adenocarcinoma CT (Outer Lungs)",
             "Sample 2: Large Cell Carcinoma CT (Any Lung Area)",
             "Sample 3: Squamous Cell Carcinoma CT (Central Airways)",
-            "Sample 4: Normal CT Scan (Clear Lung Fields)"
+            "Sample 4: Normal CT Scan (Clear Lung Fields)",
+            "Sample 5: Clinical Siemens CT Thorax Scan"
         )
         val adapter = ArrayAdapter(this, R.layout.dropdown_item_medical, sampleOptions)
         binding.spinnerSamplePreset.setAdapter(adapter)
@@ -151,6 +152,7 @@ class MainActivity : AppCompatActivity() {
                 1 -> applyPreset("large_cell", "RAD-2026-102", "Elena Rostova", 42, "Female", "Preset: Large Cell Carcinoma CT")
                 2 -> applyPreset("squamous", "RAD-2026-103", "Marcus Vance", 63, "Male", "Preset: Squamous Cell Carcinoma CT")
                 3 -> applyPreset("normal", "RAD-2026-104", "Sophia Lin", 29, "Female", "Preset: Normal CT Scan")
+                4 -> applyPreset("siemens", "RAD-2026-105", "David Miller", 51, "Male", "Preset: Clinical Siemens CT Thorax")
             }
         }
     }
@@ -176,6 +178,7 @@ class MainActivity : AppCompatActivity() {
             "adenocarcinoma" -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_adenocarcinoma)
             "large_cell" -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_large_cell)
             "squamous" -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_squamous)
+            "siemens" -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_siemens)
             else -> binding.ivScanPreview.setImageResource(R.drawable.sample_ct_normal)
         }
     }
